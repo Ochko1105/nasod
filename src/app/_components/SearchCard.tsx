@@ -206,12 +206,6 @@ export function SearchCard() {
         {/* ================= RESULT ================= */}
         {loading && <ResultSkeleton />}
 
-        {!loading && results.length === 0 && (
-          <p className="text-center text-muted-foreground mt-4">
-            Тохирох мэргэжил олдсонгүй
-          </p>
-        )}
-
         {!loading && results.length > 0 && (
           <Card className="p-4 shadow-xl">
             <div className="grid gap-3">
@@ -243,6 +237,11 @@ export function SearchCard() {
               ))}
             </div>
           </Card>
+        )}
+        {!loading && results.length === 0 && (
+          <p className="text-center text-muted-foreground mt-4">
+            Тохирох мэргэжил олдсонгүй
+          </p>
         )}
       </Card>
     </div>
