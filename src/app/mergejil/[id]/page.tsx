@@ -22,6 +22,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function Mergejil() {
   const params = useParams();
   const majorId = Number(params.id);
+  console.log({ params });
+  console.log({ majorId });
 
   const { data, error, isLoading } = useSWR(`/api/majors/${majorId}`, fetcher);
   if (isLoading || !data) {
