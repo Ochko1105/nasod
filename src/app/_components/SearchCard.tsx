@@ -233,15 +233,15 @@ export function SearchCard() {
                       {r.subjects.name}: {r.userScore ?? 0} / {r.min_score}
                     </p>
                   ))}
+                  {!loading && results.length === 0 && (
+                    <p className="text-center text-muted-foreground mt-4">
+                      Тохирох мэргэжил олдсонгүй
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
           </Card>
-        )}
-        {!loading && results.length === 0 && (
-          <p className="text-center text-muted-foreground mt-4">
-            Тохирох мэргэжил олдсонгүй
-          </p>
         )}
       </Card>
     </div>
