@@ -84,6 +84,19 @@ export default function UniversityDetailPage2({ params }: Props) {
   const university = majors[0]?.universities;
   return (
     <div className="min-h-screen bg-white">
+      <div className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center gap-2 text-sm">
+            <a href="/" className="text-gray-600 hover:text-gray-900">
+              Нүүр хуудас
+            </a>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-900 font-medium">
+              {university?.name}
+            </span>
+          </div>
+        </div>
+      </div>
       {/* Hero Section */}
       <div
         className="
@@ -126,7 +139,7 @@ export default function UniversityDetailPage2({ params }: Props) {
               <div className="flex gap-3">
                 <Button
                   variant="outline"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  className="bg-white/10 border-white/20 cursor-pointer text-white hover:bg-white/20"
                 >
                   <Globe className="h-4 w-4 mr-2" />
                   Вэбсайт үзэх
@@ -134,7 +147,7 @@ export default function UniversityDetailPage2({ params }: Props) {
 
                 <Button
                   onClick={handleRegisterClick}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white"
+                  className="bg-cyan-500 cursor-pointer hover:bg-cyan-600 text-white"
                 >
                   Бүртгүүлэх
                   <ChevronRight className="h-4 w-4 ml-1" />
@@ -229,13 +242,13 @@ export default function UniversityDetailPage2({ params }: Props) {
                   <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                     Босго оноо
                   </div>
-                  <div className="text-3xl font-bold">450-550</div>
+                  <div className="text-3xl font-bold">550-650</div>
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                    Дундаж ГПА
+                    Дундаж голч
                   </div>
-                  <div className="text-3xl font-bold">3</div>
+                  <div className="text-3xl font-bold">3.2</div>
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
@@ -331,8 +344,8 @@ export default function UniversityDetailPage2({ params }: Props) {
                     <CheckCircle2 className="h-4 w-4 text-green-600" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">8 САР 1, 2026</p>
-                    <p className="text-sm text-gray-600">Өргөдөл эхэллээ</p>
+                    <p className="text-sm font-medium">7 САР 1, 2026</p>
+                    <p className="text-sm text-gray-600">Бүртгэл эхлэх</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -340,17 +353,19 @@ export default function UniversityDetailPage2({ params }: Props) {
                     <div className="h-2 w-2 rounded-full bg-orange-600"></div>
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">11 САР 1, 2026</p>
-                    <p className="text-sm text-gray-600">
-                      Эрт хариулт өгөх хугацаа
-                    </p>
+                    <p className="text-sm font-medium">8 САР 1, 2026</p>
+                    <p className="text-sm text-gray-600">Бүртгэл дуусах</p>
                     <Badge variant="destructive" className="mt-1 text-xs">
-                      5 хоногт хаагдах
+                      30 хоногт хаагдах
                     </Badge>
                   </div>
                 </div>
               </div>
-              <Button variant="link" className="w-full mt-4 text-cyan-500 p-0">
+              <Button
+                onClick={handleRegisterClick}
+                variant="link"
+                className="w-full mt-4 cursor-pointer text-cyan-500 p-0"
+              >
                 Миний xуанлид нэмэх
               </Button>
             </Card>
@@ -368,19 +383,22 @@ export default function UniversityDetailPage2({ params }: Props) {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-                  <span className="text-sm">$90 өргөдлийн хураамж</span>
+                  <span className="text-sm">₮37500 өргөдлийн хураамж</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-                  <span className="text-sm">Албан ёсны магадлан итгэмжлэл</span>
+                  <span className="text-sm">Боловсролын гэрчилгээ</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-                  <span className="text-sm">САТ эсвэл АКТ оноо</span>
+                  <span className="text-sm">
+                    САТ эсвэл IELTS оноо{" "}
+                    <span className="text-blue-500">байхгүй байсанч болно</span>
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-                  <span className="text-sm">2 багшийн үнэлгээ</span>
+                  <span className="text-sm">Багшийн үнэлгээ</span>
                 </div>
               </div>
               <Button
@@ -402,7 +420,7 @@ export default function UniversityDetailPage2({ params }: Props) {
                     href="tel:6507232091"
                     className="text-sm text-gray-700 hover:text-cyan-500"
                   >
-                    (650) 723-2091
+                    (976) 7023-2091
                   </a>
                 </div>
                 <div className="flex items-start gap-3">
@@ -411,7 +429,7 @@ export default function UniversityDetailPage2({ params }: Props) {
                     href="mailto:admission@stanford.edu"
                     className="text-sm text-gray-700 hover:text-cyan-500"
                   >
-                    admission@stanford.edu
+                    admission@num.edu
                   </a>
                 </div>
                 <div className="flex items-start gap-3">

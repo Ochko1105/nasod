@@ -56,13 +56,13 @@ export function Header() {
 
           <SignedOut>
             <SignInButton>
-              <Button className=" hover:bg-cyan-600 text-white">
+              <Button className=" hover:bg-cyan-600 cursor-pointer text-white">
                 Бүртгүүлэх
               </Button>
             </SignInButton>
 
             <SignUpButton>
-              <Button className="bg-cyan-500 hover:bg-cyan-600 text-white">
+              <Button className="bg-cyan-500 cursor-pointer hover:bg-cyan-600 text-white">
                 Нэвтрэх
               </Button>
             </SignUpButton>

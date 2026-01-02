@@ -33,8 +33,7 @@ export default function Mergejil() {
 
   const params = useParams();
   const majorId = Number(params.id);
-  console.log({ params });
-  console.log({ majorId });
+
   const { isSignedIn } = useUser();
 
   const handleRegisterClick = () => {
@@ -241,7 +240,7 @@ export default function Mergejil() {
 
           <Card className="p-6 bg-white">
             <div className="flex items-start justify-between mb-4">
-              <span className="text-sm text-gray-600">Хугацаа дуусах</span>
+              <span className="text-sm text-gray-600">Бүртгэлийн хугацаа</span>
               <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
                 <svg
                   className="w-5 h-5 text-orange-600"
@@ -258,10 +257,16 @@ export default function Mergejil() {
                 </svg>
               </div>
             </div>
-            <div className="text-4xl font-bold text-gray-900 mb-2">
-              8-р сарын 15
+
+            {/* Date range */}
+            <div className="text-2xl font-bold text-gray-900 mb-1">
+              7-р сарын 1 нээс
+            </div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">
+              8-р сарын 15 хүртэл
             </div>
 
+            {/* Days left */}
             <div className="text-sm text-orange-600 font-medium">
               {daysLeft > 0 ? `${daysLeft} хоног үлдсэн` : "Хугацаа дууссан"}
             </div>
@@ -296,9 +301,8 @@ export default function Mergejil() {
               </div>
 
               <p className="text-blue-600 mb-6 leading-relaxed">
-                Өргөдөл гаргагчид дараах хичээлүүдийн оноо ирүүлэх ёстой. Эдгээр
-                хичээлүүдийн жигнэсэн дунджийг элсэлтийн оноо тооцоход
-                ашигладаг.
+                Өргөдөл гаргагчид дараах хичээлүүдийн оноог илгээх хэрэгтэй .
+                Эдгээр хичээлүүдийн дунджийг элсэлтийн оноо тооцоход ашигладаг.
               </p>
 
               <div className="flex flex-wrap gap-3 mb-6">
@@ -389,7 +393,7 @@ export default function Mergejil() {
                       <div className="font-medium text-gray-900">
                         Тэтгэлгийн заавар
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 cursor-pointer">
                         Гадаад холбоос
                       </div>
                     </div>
@@ -419,7 +423,7 @@ export default function Mergejil() {
               </p>
 
               <Button
-                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white mb-3 h-12 text-base font-medium"
+                className="w-full bg-cyan-500 cursor-pointer hover:bg-cyan-600 text-white mb-3 h-12 text-base font-medium"
                 onClick={handleRegisterClick}
               >
                 Бүртгэлийн хураамж төлөх
@@ -467,7 +471,11 @@ export default function Mergejil() {
                 </DialogContent>
               </Dialog>
 
-              <Button variant="outline" className="w-full h-12 bg-transparent">
+              <Button
+                variant="outline"
+                onClick={handleRegisterClick}
+                className="cursor-pointer w-full h-12 bg-transparent"
+              >
                 <Calendar className="mr-2 w-5 h-5" />
                 Хуанлид нэмэх
               </Button>
