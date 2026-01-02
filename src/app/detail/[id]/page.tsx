@@ -12,12 +12,12 @@ import {
   Phone,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
-import { Major } from "@/src/lib/types/type";
+import { Major, MONGOL_MONTHS, NumDates } from "@/src/lib/types/type";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner"; // shadcn toast
@@ -37,6 +37,29 @@ interface Props {
 
 export default function UniversityDetailPage2({ params }: Props) {
   const [open, setOpen] = useState(false);
+  const [data, setData] = useState<NumDates | null>(null);
+
+  useEffect(() => {
+    fetch("/api/turshih")
+      .then((res) => res.json())
+      .then((json) => setData(json))
+      .catch((err) => console.error(err));
+  }, []);
+
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    const month = MONGOL_MONTHS[d.getMonth()];
+    const day = d.getDate();
+    return `${month} ${day}`;
+  };
+  const daysLeft = (endDateStr: string) => {
+    const today = new Date();
+    const endDate = new Date(endDateStr);
+    const diffTime = endDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  };
+
   const resolvedParams = React.use(params);
   const uniId = Number(resolvedParams.id);
   const {
@@ -44,20 +67,56 @@ export default function UniversityDetailPage2({ params }: Props) {
     error: majorsError,
     isLoading: majorsLoading,
   } = useSWR<Major[]>(`/api/majors?university_id=${uniId}`, fetcher);
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
 
-  const handleRegisterClick = () => {
-    if (!isSignedIn) {
+  const handleRegisterClick = async () => {
+    if (!isSignedIn || !user) {
       toast.warning("Нэвтэрч орно уу", {
         description: "Өргөдөл гаргахын тулд эхлээд нэвтрэх шаардлагатай.",
       });
       return;
     }
 
-    setOpen(true); // QR modal нээх
-  };
+    const userId = Number(1); // эсвэл user?.primaryEmailAddress?.id таны схемээс хамаарна
+    const universityId = uniId; // resolvedParams.id-аас авна
+    // const startDate = new Date();
+    // startDate.setMonth(0); // 0 = January
+    // startDate.setDate(15); // 15-ны өдөр
 
-  console.log({ majors });
+    // const endDate = new Date();
+    // endDate.setMonth(0); // 0 = January
+    // endDate.setDate(22); // 22-ны өдөр
+
+    const startDateStr = data?.start_date ?? "2025-12-01";
+    const endDateStr = data?.end_date ?? "2025-12-15";
+    try {
+      const res = await fetch("/api/datesave", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: userId,
+          university_id: universityId,
+          start_date: startDateStr,
+          end_date: endDateStr,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error("Өргөдөл гаргах явцад алдаа гарлаа: " + data.error);
+        return;
+      }
+
+      toast.success("Амжилттай бүртгэгдлээ!");
+      setOpen(false); // modal хаах
+    } catch (error) {
+      console.error(error);
+      toast.error("Серверийн алдаа гарлаа");
+    }
+  };
+  console.log(user?.primaryEmailAddress?.id);
+
   if (majorsLoading || !majors) {
     return (
       <div className="min-h-screen bg-white animate-pulse">
@@ -339,28 +398,38 @@ export default function UniversityDetailPage2({ params }: Props) {
                 <h3 className="font-semibold">Элсэлтийн хуваарь</h3>
               </div>
               <div className="space-y-4">
+                {/* Бүртгэл эхлэх */}
                 <div className="flex items-start gap-3">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
                     <CheckCircle2 className="h-4 w-4 text-green-600" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">7 САР 1, 2026</p>
+                    <p className="text-sm font-medium">
+                      {data ? formatDate(data.start_date) : "-"}
+                    </p>
                     <p className="text-sm text-gray-600">Бүртгэл эхлэх</p>
                   </div>
                 </div>
+
+                {/* Бүртгэл дуусах */}
                 <div className="flex items-start gap-3">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-100">
                     <div className="h-2 w-2 rounded-full bg-orange-600"></div>
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">8 САР 1, 2026</p>
+                    <p className="text-sm font-medium">
+                      {data ? formatDate(data.end_date) : "-"}
+                    </p>
                     <p className="text-sm text-gray-600">Бүртгэл дуусах</p>
-                    <Badge variant="destructive" className="mt-1 text-xs">
-                      30 хоногт хаагдах
-                    </Badge>
+                    {data && (
+                      <Badge variant="destructive" className="mt-1 text-xs">
+                        {daysLeft(data.end_date)} хоногт хаагдах
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>
+
               <Button
                 onClick={handleRegisterClick}
                 variant="link"

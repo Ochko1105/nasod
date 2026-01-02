@@ -6,6 +6,8 @@ export type University = {
   website: string;
   image?: string;
   logo?: string;
+  burtgelduusah_end_date: string;
+  burtgelehleh_start_date: string;
 };
 
 export type Subject = {
@@ -32,3 +34,24 @@ export type Major = {
   major_requirements: MajorRequirement[];
   created_at: string;
 };
+
+export type NumDates = {
+  start_date: string;
+  end_date: string;
+  raw_text: string;
+};
+
+export const MONGOL_MONTHS = [
+  "1 сарын",
+  "2 сарын",
+  "3 сарын",
+  "4 сарын",
+  "5 сарын",
+  "6 сарын",
+  "7 сарын",
+  "8 сарын",
+  "9 сарын",
+  "10 сарын",
+  "11 сарын",
+  "12 сарын",
+];
