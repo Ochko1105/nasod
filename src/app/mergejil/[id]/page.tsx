@@ -8,22 +8,45 @@ import {
   Share2,
   User,
 } from "lucide-react";
-
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { Avatar } from "../../components/ui/avatar";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
+import Image from "next/image";
 import { Card } from "../../components/ui/card";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog";
+import { useUser } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Mergejil() {
+  const [open, setOpen] = useState(false);
+
   const params = useParams();
   const majorId = Number(params.id);
   console.log({ params });
   console.log({ majorId });
+  const { isSignedIn } = useUser();
+
+  const handleRegisterClick = () => {
+    if (!isSignedIn) {
+      toast.warning("Нэвтэрч орно уу", {
+        description: "Өргөдөл гаргахын тулд эхлээд нэвтрэх шаардлагатай.",
+      });
+      return;
+    }
+
+    setOpen(true); // QR modal нээх
+  };
 
   const { data, error, isLoading } = useSWR(`/api/majors/${majorId}`, fetcher);
   if (isLoading || !data) {
@@ -157,7 +180,7 @@ export default function Mergejil() {
             <div className="flex items-center gap-1 text-green-600 text-sm">
               <span className="text-4xl font-bold text-gray-900">500</span>
               <span>↗</span>
-              <span>2022-оос +0.5</span>
+              <span>2024-оос +0.5</span>
             </div>
           </Card>
 
@@ -307,7 +330,7 @@ export default function Mergejil() {
                 <ul className="space-y-2 text-blue-600">
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 mt-1">•</span>
-                    <span>Ахлах сургуулийн голч дүн хамгийн багадаа 3.0</span>
+                    <span>Ахлах сургуулийн голч дүн хамгийн багадаа 80</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 mt-1">•</span>
@@ -387,14 +410,62 @@ export default function Mergejil() {
                 Өргөдөл гаргахад бэлэн үү?
               </h3>
               <p className="text-sm text-gray-600 mb-6">
-                Эхлэхээс өмнө шаардлагатай бүх баримт бичгийг бэлтгэсэн эсэхийг
-                шалгаарай.
+                Өргөдөл гаргахын өмнө{" "}
+                <span className="font-medium text-gray-800">
+                  бүртгэлийн хураамжийг
+                </span>{" "}
+                төлсөн байх шаардлагатай. Төлбөр баталгаажсаны дараа өргөдөл
+                эхлүүлэх боломжтой.
               </p>
 
-              <Button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white mb-3 h-12 text-base font-medium">
-                Өргөдөл эхлүүлэх
+              <Button
+                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white mb-3 h-12 text-base font-medium"
+                onClick={handleRegisterClick}
+              >
+                Бүртгэлийн хураамж төлөх
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
+
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Бүртгэлийн хураамж төлөх</DialogTitle>
+                  </DialogHeader>
+
+                  <div className="flex flex-col items-center text-center gap-4">
+                    {/* QR Image */}
+                    <div className="w-48 h-48 rounded-lg border bg-white p-2">
+                      <Image
+                        src="/qr-mock.png"
+                        alt="Payment QR"
+                        width={192}
+                        height={192}
+                        className="rounded-md"
+                      />
+                    </div>
+
+                    {/* Amount */}
+                    <div>
+                      <p className="text-sm text-gray-500">Төлөх дүн</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        37,500 ₮
+                      </p>
+                    </div>
+
+                    <p className="text-xs text-gray-500">
+                      Энэхүү хураамжийг төлснөөр та их сургуулийн өргөдөл гаргах
+                      эрхтэй болно. Төлбөрийг буцаан олгохгүй.
+                    </p>
+
+                    <Button
+                      className="w-full bg-cyan-500 hover:bg-cyan-600 text-white"
+                      onClick={() => setOpen(false)}
+                    >
+                      Төлбөр баталгаажуулах
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
               <Button variant="outline" className="w-full h-12 bg-transparent">
                 <Calendar className="mr-2 w-5 h-5" />

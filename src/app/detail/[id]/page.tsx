@@ -12,12 +12,23 @@ import {
   Phone,
 } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import useSWR from "swr";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Major } from "@/src/lib/types/type";
+import Image from "next/image";
+import { useUser } from "@clerk/nextjs";
+import { toast } from "sonner"; // shadcn toast
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog";
+
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Props {
@@ -25,6 +36,7 @@ interface Props {
 }
 
 export default function UniversityDetailPage2({ params }: Props) {
+  const [open, setOpen] = useState(false);
   const resolvedParams = React.use(params);
   const uniId = Number(resolvedParams.id);
   const {
@@ -32,6 +44,18 @@ export default function UniversityDetailPage2({ params }: Props) {
     error: majorsError,
     isLoading: majorsLoading,
   } = useSWR<Major[]>(`/api/majors?university_id=${uniId}`, fetcher);
+  const { isSignedIn } = useUser();
+
+  const handleRegisterClick = () => {
+    if (!isSignedIn) {
+      toast.warning("Нэвтэрч орно уу", {
+        description: "Өргөдөл гаргахын тулд эхлээд нэвтрэх шаардлагатай.",
+      });
+      return;
+    }
+
+    setOpen(true); // QR modal нээх
+  };
 
   console.log({ majors });
   if (majorsLoading || !majors) {
@@ -61,41 +85,101 @@ export default function UniversityDetailPage2({ params }: Props) {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="g-linear-to-br from-slate-600 to-slate-700 px-6 py-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm">
-              {/* SVG */}
-            </div>
-            <Badge
-              variant="secondary"
-              className="bg-gray-600/50 text-white border-gray-500"
-            >
-              {university?.name ?? "Мэдээлэл олдсонгүй"}
-            </Badge>
-          </div>
-          <div className="flex items-end justify-between">
-            <div>
-              <h1 className="text-5xl font-bold text-white mb-3">
-                {university?.name}
-              </h1>
-              <div className="flex items-center gap-2 text-white/90">
-                <MapPin className="h-4 w-4" />
-                <span>{university?.city ?? "Мэдээлэл олдсонгүй"}</span>
+      <div
+        className="
+    relative
+    bg-[url('/university-logo-arts.jpg')]
+    bg-cover
+    bg-center
+  "
+      >
+        {/* Overlay */}
+        <div className="bg-linear-to-br from-slate-600/90 to-slate-900/90 px-6 py-16">
+          <div className="mx-auto max-w-7xl">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm">
+                <img
+                  src="/university-logo-arts.jpg"
+                  className="h-full w-full object-contain"
+                />
               </div>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                className="bg-white/10 border-white/20 text-black hover:bg-white/20"
+
+              <Badge
+                variant="secondary"
+                className="bg-gray-600/50 text-white border-gray-500"
               >
-                <Globe className="h-4 w-4 mr-2" />
-                Вэбсайт үзэх
-              </Button>
-              <Button className="bg-cyan-500 hover:bg-cyan-600 text-white">
-                Одоо өргөдөл гаргах
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
+                {university?.name ?? "Мэдээлэл олдсонгүй"}
+              </Badge>
+            </div>
+
+            <div className="flex items-end justify-between">
+              <div>
+                <h1 className="text-5xl font-bold text-white mb-3">
+                  {university?.name}
+                </h1>
+                <div className="flex items-center gap-2 text-white/90">
+                  <MapPin className="h-4 w-4" />
+                  <span>{university?.city ?? "Мэдээлэл олдсонгүй"}</span>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                >
+                  <Globe className="h-4 w-4 mr-2" />
+                  Вэбсайт үзэх
+                </Button>
+
+                <Button
+                  onClick={handleRegisterClick}
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white"
+                >
+                  Бүртгүүлэх
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Бүртгэлийн хураамж төлөх</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="flex flex-col items-center text-center gap-4">
+                      {/* QR Image */}
+                      <div className="w-48 h-48 rounded-lg border bg-white p-2">
+                        <Image
+                          src="/qr-mock.png"
+                          alt="Payment QR"
+                          width={192}
+                          height={192}
+                          className="rounded-md"
+                        />
+                      </div>
+
+                      {/* Amount */}
+                      <div>
+                        <p className="text-sm text-gray-500">Төлөх дүн</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          37,500 ₮
+                        </p>
+                      </div>
+
+                      <p className="text-xs text-gray-500">
+                        Энэхүү хураамжийг төлснөөр та их сургуулийн өргөдөл
+                        гаргах эрхтэй болно. Төлбөрийг буцаан олгохгүй.
+                      </p>
+
+                      <Button
+                        className="w-full bg-cyan-500 hover:bg-cyan-600 text-white"
+                        onClick={() => setOpen(false)}
+                      >
+                        Төлбөр баталгаажуулах
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </div>
         </div>
@@ -214,11 +298,13 @@ export default function UniversityDetailPage2({ params }: Props) {
                             Хамгийн бага оноо
                           </div>
                           <div className="text-2xl font-bold">
-                            {Math.min(
-                              ...major.major_requirements.map(
-                                (req) => req.min_score
-                              )
-                            ) ?? "-"}
+                            {major.major_requirements.length > 0
+                              ? Math.min(
+                                  ...major.major_requirements.map(
+                                    (req) => req.min_score
+                                  )
+                                )
+                              : "--"}
                           </div>
                         </div>
                       </div>
