@@ -11,10 +11,8 @@ import {
 import { useRouter } from "next/navigation";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
-
-import { useState } from "react";
-
 import Image from "next/image";
+import { useState } from "react";
 
 type UniversityCardProps = {
   id: number;
@@ -22,10 +20,10 @@ type UniversityCardProps = {
   location: string;
   image: string;
   status: "open" | "closing-soon" | "closed";
-  minScore: string;
-  admissionRate: string | null;
-  deadline: string | null;
-  nextCycle: string | null;
+  minScore?: string;
+  admissionRate?: string | null;
+  deadline?: string | null;
+  nextCycle?: string | null;
 };
 
 const getIconForUniversity = (name: string) => {
@@ -43,6 +41,7 @@ export default function UniversityCard({
   location,
   image,
   status,
+  minScore,
 }: UniversityCardProps) {
   const router = useRouter();
   const Icon = getIconForUniversity(name);
@@ -51,17 +50,15 @@ export default function UniversityCard({
     router.push(`/detail/${id}`);
   };
 
-  const ImageWithFallback = () => {
-    const [imgSrc, setImgSrc] = useState("/university-logo-arts.jpg");
-
+  // ✅ Image fallback component
+  const ImageWithFallback = ({ src }: { src: string }) => {
+    const [imgSrc, setImgSrc] = useState(src || "/university-logo-arts.jpg");
     return (
-      <Image
+      <img
         src={imgSrc}
-        alt="University"
-        width={192}
-        height={192}
-        onError={() => setImgSrc("/image-fallback.png")}
-        className="rounded-md object-cover"
+        alt={name}
+        className="w-full h-full object-cover rounded-md"
+        onError={(e) => (e.currentTarget.src = "/university-logo-arts.jpg")}
       />
     );
   };
@@ -72,9 +69,8 @@ export default function UniversityCard({
       className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
     >
       <div className="relative h-48">
-        {image && (
-          <img src={image} alt={name} className="w-full h-full object-cover" />
-        )}
+        {/* ✅ Fallback image ашиглаж харуулах */}
+        <ImageWithFallback src={image} />
 
         <div className="absolute top-4 right-4">
           {status === "open" && (
@@ -111,13 +107,12 @@ export default function UniversityCard({
 
         <div className="flex justify-between text-sm border-t pt-2">
           <span>Босго оноо</span>
-          <span className="font-semibold">500</span>
+          <span className="font-semibold">{minScore ?? "–"}</span>
         </div>
 
-        {/* Button дээр дарахад давхар trigger болохоос сэргийлнэ */}
         <Button
           onClick={(e) => {
-            e.stopPropagation();
+            e.stopPropagation(); // давхар click-оос сэргийлэх
             handleViewDetails();
           }}
           variant="outline"
