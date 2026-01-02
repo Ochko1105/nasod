@@ -11,8 +11,10 @@ import {
 import { useRouter } from "next/navigation";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
-import Image from "next/image";
+
 import { useState } from "react";
+
+import Image from "next/image";
 
 type UniversityCardProps = {
   id: number;
@@ -20,10 +22,10 @@ type UniversityCardProps = {
   location: string;
   image: string;
   status: "open" | "closing-soon" | "closed";
-  minScore?: string;
-  admissionRate?: string | null;
-  deadline?: string | null;
-  nextCycle?: string | null;
+  minScore: string;
+  admissionRate: string | null;
+  deadline: string | null;
+  nextCycle: string | null;
 };
 
 const getIconForUniversity = (name: string) => {
@@ -41,7 +43,6 @@ export default function UniversityCard({
   location,
   image,
   status,
-  minScore,
 }: UniversityCardProps) {
   const router = useRouter();
   const Icon = getIconForUniversity(name);
@@ -50,17 +51,17 @@ export default function UniversityCard({
     router.push(`/detail/${id}`);
   };
 
-  // ✅ Image fallback component
-  const ImageWithFallback = ({ src }: { src: string }) => {
-    const [imgSrc, setImgSrc] = useState(src || "/image-fallback.png");
+  const ImageWithFallback = () => {
+    const [imgSrc, setImgSrc] = useState("/university-logo-arts.jpg");
+
     return (
       <Image
         src={imgSrc}
-        alt={name}
-        width={500}
-        height={300}
-        className="w-full h-full object-cover"
+        alt="University"
+        width={192}
+        height={192}
         onError={() => setImgSrc("/image-fallback.png")}
+        className="rounded-md object-cover"
       />
     );
   };
@@ -71,8 +72,9 @@ export default function UniversityCard({
       className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
     >
       <div className="relative h-48">
-        {/* ✅ Fallback image ашиглаж харуулах */}
-        <ImageWithFallback src={image} />
+        {image && (
+          <img src={image} alt={name} className="w-full h-full object-cover" />
+        )}
 
         <div className="absolute top-4 right-4">
           {status === "open" && (
@@ -109,12 +111,13 @@ export default function UniversityCard({
 
         <div className="flex justify-between text-sm border-t pt-2">
           <span>Босго оноо</span>
-          <span className="font-semibold">{minScore ?? "–"}</span>
+          <span className="font-semibold">500</span>
         </div>
 
+        {/* Button дээр дарахад давхар trigger болохоос сэргийлнэ */}
         <Button
           onClick={(e) => {
-            e.stopPropagation(); // давхар click-оос сэргийлэх
+            e.stopPropagation();
             handleViewDetails();
           }}
           variant="outline"
