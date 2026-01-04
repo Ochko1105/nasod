@@ -16,12 +16,19 @@ export type Subject = {
   type?: string;
 };
 
+export interface FilterState {
+  search: string;
+  categories: string[];
+  minScore: number;
+  sortBy: string;
+}
+
 export type MajorRequirement = {
   id: number;
   major_id: number;
   min_score: number;
   subject_id: number;
-  subjects: Subject; // Массив биш, дан объект
+  subjects: Subject;
 };
 
 export type Major = {
@@ -30,7 +37,7 @@ export type Major = {
   university_id: number;
   degree_type: string;
   description: string;
-  universities: University; // Дан объект
+  universities: University;
   major_requirements: MajorRequirement[];
   created_at: string;
 };
