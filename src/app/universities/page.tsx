@@ -31,6 +31,7 @@ export default function UniversitiesPage() {
     minScore: filters.minScore.toString(),
     sortBy: filters.sortBy,
   }).toString();
+  console.log({ query });
 
   const { data: programs = [], isLoading } = useSWR(
     `/api/universities?search=${
@@ -40,8 +41,7 @@ export default function UniversitiesPage() {
     }&sortBy=${filters.sortBy}`,
     fetcher
   );
-
-  console.log("Ih surguuli", programs);
+  console.log({ programs });
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">

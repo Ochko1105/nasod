@@ -26,6 +26,7 @@ export function FilterSidebar({ filters, setFilters, resetFilters }: any) {
       : filters.categories.filter((c: number) => c !== id);
     setFilters({ ...filters, categories: newCats });
   };
+  console.log({ filters });
 
   return (
     <aside className="space-y-6 sticky top-24">

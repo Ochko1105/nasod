@@ -21,6 +21,7 @@ export function ProgramGrid({
 }: any) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { data: categories = [] } = useSWR("/api/majors");
+  console.log({ categories });
 
   if (isLoading) return <LoadingSkeleton />;
 

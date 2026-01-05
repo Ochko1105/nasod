@@ -35,9 +35,37 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+type Scholarship = {
+  title: string;
+  link: string;
+  image?: string;
+};
+
 export default function UniversityDetailPage2({ params }: Props) {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<NumDates | null>(null);
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "scholarships" | "majors"
+  >("overview");
+  const [data2, setData2] = useState<Scholarship[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/tetgeleg")
+      .then((res) => {
+        if (!res.ok) throw new Error("Fetch failed");
+        return res.json();
+      })
+      .then((json) => {
+        setData2(json);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Мэдээлэл ачаалж чадсангүй");
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     fetch("/api/turshih")
@@ -77,15 +105,8 @@ export default function UniversityDetailPage2({ params }: Props) {
       return;
     }
 
-    const userId = Number(1); // эсвэл user?.primaryEmailAddress?.id таны схемээс хамаарна
-    const universityId = uniId; // resolvedParams.id-аас авна
-    // const startDate = new Date();
-    // startDate.setMonth(0); // 0 = January
-    // startDate.setDate(15); // 15-ны өдөр
-
-    // const endDate = new Date();
-    // endDate.setMonth(0); // 0 = January
-    // endDate.setDate(22); // 22-ны өдөр
+    const userId = Number(1);
+    const universityId = uniId;
 
     const startDateStr = data?.start_date ?? "2025-12-01";
     const endDateStr = data?.end_date ?? "2025-12-15";
@@ -141,6 +162,7 @@ export default function UniversityDetailPage2({ params }: Props) {
   if (majorsError) return <p>Өгөгдөл авахад алдаа гарлаа</p>;
   if (!majors) return <p>Их сургуулийн мэдээлэл олдсонгүй</p>;
   const university = majors[0]?.universities;
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b border-gray-200">
@@ -267,9 +289,17 @@ export default function UniversityDetailPage2({ params }: Props) {
             >
               Тойм
             </a>
-            <a href="#" className="py-4 text-gray-600 hover:text-gray-900">
-              Элсэлт
-            </a>
+            <button
+              onClick={() => setActiveTab("scholarships")}
+              className={`py-4 ${
+                activeTab === "scholarships"
+                  ? "border-b-2 border-cyan-500 text-cyan-500 cursor-pointer font-medium"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Тэтгэлгийн мэдээлэл
+            </button>
+
             <a href="#" className="py-4 text-gray-600 hover:text-gray-900">
               Мэргэжлүүд & Хөтөлбөрүүд
             </a>
@@ -385,6 +415,49 @@ export default function UniversityDetailPage2({ params }: Props) {
                     </Card>
                   </Link>
                 ))}
+                {activeTab === "scholarships" && (
+                  <div className="max-w-4xl mx-auto p-6">
+                    <h1 className="text-2xl font-bold mb-6">
+                      🎓 Тэтгэлгийн мэдээнүүд
+                    </h1>
+
+                    <ul className="grid gap-6 md:grid-cols-2">
+                      {data2.map((item, i) => (
+                        <li
+                          key={i}
+                          className="border rounded-xl overflow-hidden bg-white hover:shadow-md transition"
+                        >
+                          {/* IMAGE */}
+                          {item.image && (
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              className="w-full h-44 object-cover"
+                            />
+                          )}
+
+                          {/* CONTENT */}
+                          <div className="p-4">
+                            <a
+                              href={item.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block font-medium text-blue-600 hover:underline"
+                            >
+                              {item.title}
+                            </a>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {data2.length === 0 && (
+                      <p className="text-center text-gray-500 mt-10">
+                        Одоогоор тэтгэлгийн мэдээлэл алга байна.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </section>
           </div>

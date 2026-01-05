@@ -1,68 +1,80 @@
 "use client";
-import { MONGOL_MONTHS } from "@/src/lib/types/type";
-import { useState } from "react";
 
-// Монгол сарыг array-д
+import { useEffect, useState } from "react";
 
-export default function UniversityDates() {
-  const [dates, setDates] = useState<{
-    start_date: string;
-    end_date: string;
-  } | null>(null);
-  const [loading, setLoading] = useState(false);
+type Scholarship = {
+  title: string;
+  link: string;
+  image?: string;
+};
 
-  const fetchDates = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/turshih2", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ universityName: "ШУТИС" }),
+export default function ScholarshipsPage() {
+  const [data, setData] = useState<Scholarship[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/tetgeleg")
+      .then((res) => {
+        if (!res.ok) throw new Error("Fetch failed");
+        return res.json();
+      })
+      .then((json) => {
+        setData(json);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Мэдээлэл ачаалж чадсангүй");
+        setLoading(false);
       });
-      const data = await res.json();
-      setDates(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, []);
 
-  // "MM-DD" → "X сарын DD"
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return "-";
-    const [month, day] = dateStr.split("-").map((v) => Number(v));
-    const monthText = MONGOL_MONTHS[month - 1]; // array index 0-с эхэлнэ
-    return `${monthText} ${day}`;
-  };
+  if (loading)
+    return (
+      <div className="text-center p-10 text-gray-500">Ачаалж байна...</div>
+    );
+
+  if (error)
+    return <div className="text-center p-10 text-red-500">{error}</div>;
 
   return (
-    <div className="space-y-4">
-      <button
-        className="px-4 py-2 bg-blue-500 text-white rounded"
-        onClick={fetchDates}
-      >
-        Огноо авах
-      </button>
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6">🎓 Тэтгэлгийн мэдээнүүд</h1>
 
-      {loading && <p>Ачааллаж байна...</p>}
+      <ul className="grid gap-6 md:grid-cols-2">
+        {data.map((item, i) => (
+          <li
+            key={i}
+            className="border rounded-xl overflow-hidden bg-white hover:shadow-md transition"
+          >
+            {/* IMAGE */}
+            {item.image && (
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-44 object-cover"
+              />
+            )}
 
-      {dates && (
-        <div className="space-y-2">
-          <div>
-            <p className="text-sm text-gray-600">Бүртгэл эхлэх</p>
-            <p className="text-base font-semibold">
-              {formatDate(dates.start_date)}
-            </p>
-          </div>
+            {/* CONTENT */}
+            <div className="p-4">
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block font-medium text-blue-600 hover:underline"
+              >
+                {item.title}
+              </a>
+            </div>
+          </li>
+        ))}
+      </ul>
 
-          <div>
-            <p className="text-sm text-gray-600">Бүртгэл дуусах</p>
-            <p className="text-base font-semibold">
-              {formatDate(dates.end_date)}
-            </p>
-          </div>
-        </div>
+      {data.length === 0 && (
+        <p className="text-center text-gray-500 mt-10">
+          Одоогоор тэтгэлгийн мэдээлэл алга байна.
+        </p>
       )}
     </div>
   );
