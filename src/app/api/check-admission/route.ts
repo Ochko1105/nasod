@@ -1,4 +1,5 @@
 // src/app/api/check-admission-scholarship/route.ts
+
 import prisma from "@/src/lib/prisma";
 import { NextResponse } from "next/server";
 
